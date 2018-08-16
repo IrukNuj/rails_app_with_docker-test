@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  # コンテナ(サービス)名と考えていい？
+  app:
+    # Dockerfileの有所
+    build: .
+    # ポートの番号(よくわかんない) ホスト:コンテナ
+    ports:
+      - "3000:3000"
+    # コンテナをぶるどしたときのこまんど　-p:ドライラン、お試し実行　-b:バインドするIPアドレスの指定、初期値0.0.0.0なんだけどこれいる？
+    command: bundle exec rails s -p 3000 -b '0.0.0.0'
+    # :以下がコンテナ内のファイル(?)  hoge: /huga でコンテナに書くみたいなことやってんのかなー。 あるいはパスの保存とかやってる？
+    volumes:
+      - .:/myapp
+      - bundle:/usr/local/bundle
+    # リンクするサービス
+    depends_on:
+      - db
+  db:
+    image: mysql
+    # パスワードなし
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    # Docker環境とホストをつなぐおまじない。　Docker側が3306番なので同じくつないであげるのが吉っぽい
+    ports:
+      - '3306:3306'
+    # mysql_date:/var/hogeahoge ? コロンの後ろスペース置かないの？
+    volumes:
+      - mysql_data:/var/lib/mysql
+# volumeは外に出てる
+volumes:
+  bundle:
+  mysql_data:
